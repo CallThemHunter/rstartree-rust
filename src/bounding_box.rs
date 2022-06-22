@@ -45,7 +45,15 @@ trait Geometry<T> {
 
 impl HasMargin<f64> for BoundingBox {
     fn margin(&self) -> f64 {
-        todo!()
+        let mut margin = 0.0;
+
+        let shape = self.shape();
+        let length_iter = shape.iter();
+        for length in length_iter {
+            margin += length + length
+        }
+
+        margin
     }
 
     fn margin_diff(&self, other: &Self) -> f64 {
@@ -55,7 +63,15 @@ impl HasMargin<f64> for BoundingBox {
 
 impl HasVolume<f64> for BoundingBox {
     fn volume(&self) -> f64 {
-        todo!()
+        let mut volume = 1.0;
+
+        let shape = self.shape();
+        let length_iter = shape.iter();
+        for length in length_iter {
+            volume *= length;
+        }
+
+        volume
     }
 
     fn volume_diff(&self, other: &Self) -> f64 {
