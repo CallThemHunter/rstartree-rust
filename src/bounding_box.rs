@@ -1,8 +1,7 @@
 use std::fmt;
 use std::fmt::{Display, Formatter};
-use std::io::ErrorKind::InvalidData;
 
-//type Result<T> = std::result::Result<T, IndexOutOfBoundsError>;
+use num;
 
 struct IndexOutOfBoundsError;
 
@@ -57,7 +56,7 @@ impl HasMargin<f64> for BoundingBox {
     }
 
     fn margin_diff(&self, other: &Self) -> f64 {
-        todo!()
+        num::abs(self.margin() - other.margin())
     }
 }
 
@@ -75,7 +74,7 @@ impl HasVolume<f64> for BoundingBox {
     }
 
     fn volume_diff(&self, other: &Self) -> f64 {
-        todo!()
+        num::abs(self.volume() - other.volume())
     }
 }
 
