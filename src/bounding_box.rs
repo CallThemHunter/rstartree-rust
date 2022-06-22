@@ -4,7 +4,6 @@ struct BoundingBox {
     upper_bound: Vec<f64>,
 }
 
-
 trait HasMargin<T> {
     fn margin(&self) -> T;
 
@@ -17,8 +16,8 @@ trait HasVolume<T> {
     fn volume_diff(&self, other: &Self) -> T;
 }
 
-trait Overlap<T> {
-    fn overlap(&self, other: &Self) -> Self;
+trait Overlap<T>: Sized {
+    fn overlap(&self, other: &Self) -> Option<Self>;
 }
 
 trait Geometry<T> {
@@ -52,7 +51,7 @@ impl HasVolume<f64> for BoundingBox {
 }
 
 impl Overlap<f64> for BoundingBox {
-    fn overlap(&self, other: &Self) -> Self {
+    fn overlap(&self, other: &Self) -> Option<Self> {
         todo!()
     }
 }
