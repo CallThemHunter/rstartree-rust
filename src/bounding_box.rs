@@ -80,7 +80,27 @@ impl HasVolume<f64> for BoundingBox {
 
 impl Overlap<f64> for BoundingBox {
     fn overlap(&self, other: &Self) -> Option<Self> {
-        todo!()
+        let mut overlap_lower: Vec<f64> = vec![];
+        let mut overlap_upper: Vec<f64> = vec![];
+
+        let lows_iter = self.lower_bounds.iter().zip(other.lower_bounds.iter());
+        for (own_lower, other_lower) in lows_iter {
+            overlap_lower.push(own_lower.max(*other_lower))
+        }
+
+        let high_iter = self.upper_bounds.iter().zip(other.upper_bounds.iter());
+        for (own_upper, other_upper) in high_iter {
+            overlap_upper.push(own_upper.min(*other_upper))
+        }
+
+        let validation_iter = overlap_lower.iter().zip(overlap_upper.iter());
+        for (lower, upper) in validation_iter {
+            if lower.gt(upper) {
+                return None
+            }
+        }
+
+        Some(Self { lower_bounds: overlap_lower, upper_bounds: overlap_upper })
     }
 }
 
