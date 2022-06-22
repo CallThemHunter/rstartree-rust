@@ -1,7 +1,5 @@
 use std::fmt;
-use std::fmt::{Display, Formatter};
-
-use num;
+use std::fmt::{Debug, Display, Formatter};
 
 struct IndexOutOfBoundsError;
 
@@ -16,30 +14,22 @@ struct BoundingBox {
     upper_bounds: Vec<f64>,
 }
 
+impl Display for BoundingBox {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
+}
+
+impl Debug for BoundingBox {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
+}
+
 trait HasMargin<T> {
     fn margin(&self) -> T;
 
     fn margin_diff(&self, other: &Self) -> T;
-}
-
-trait HasVolume<T> {
-    fn volume(&self) -> T;
-
-    fn volume_diff(&self, other: &Self) -> T;
-}
-
-trait Overlap<T>: Sized {
-    fn overlap(&self, other: &Self) -> Option<Self>;
-}
-
-trait Geometry<T> {
-    fn center(&self) -> Vec<T>;
-
-    fn center_along(&self, dim: usize) -> Result<T, IndexOutOfBoundsError>;
-
-    fn shape(&self) -> Vec<T>;
-
-    fn width_of(&self, dim: usize) -> Result<f64, IndexOutOfBoundsError>;
 }
 
 impl HasMargin<f64> for BoundingBox {
@@ -60,6 +50,12 @@ impl HasMargin<f64> for BoundingBox {
     }
 }
 
+trait HasVolume<T> {
+    fn volume(&self) -> T;
+
+    fn volume_diff(&self, other: &Self) -> T;
+}
+
 impl HasVolume<f64> for BoundingBox {
     fn volume(&self) -> f64 {
         let mut volume = 1.0;
@@ -76,6 +72,12 @@ impl HasVolume<f64> for BoundingBox {
     fn volume_diff(&self, other: &Self) -> f64 {
         num::abs(self.volume() - other.volume())
     }
+}
+
+trait Overlap<T>: Sized {
+    fn overlap(&self, other: &Self) -> Option<Self>;
+
+    fn encloses(&self, other: &Self) -> bool;
 }
 
 impl Overlap<f64> for BoundingBox {
@@ -102,6 +104,22 @@ impl Overlap<f64> for BoundingBox {
 
         Some(Self { lower_bounds: overlap_lower, upper_bounds: overlap_upper })
     }
+
+    fn encloses(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+trait Geometry<T> {
+    fn center(&self) -> Vec<T>;
+
+    fn center_along(&self, dim: usize) -> Result<T, IndexOutOfBoundsError>;
+
+    fn shape(&self) -> Vec<T>;
+
+    fn width_of(&self, dim: usize) -> Result<f64, IndexOutOfBoundsError>;
+
+    fn asymmetry(&self, other: &Self, dim: usize) -> f64;
 }
 
 impl Geometry<f64> for BoundingBox {
@@ -153,5 +171,9 @@ impl Geometry<f64> for BoundingBox {
         };
 
         Ok(upper - lower)
+    }
+
+    fn asymmetry(&self, other: &Self, dim: usize) -> f64 {
+        todo!()
     }
 }
