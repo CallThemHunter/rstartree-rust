@@ -107,7 +107,7 @@ impl Overlap<f64> for BoundingBox {
 impl Geometry<f64> for BoundingBox {
     fn center(&self) -> Vec<f64> {
         let mut center: Vec<f64> = vec![];
-        for (lower, upper) in self.upper_bounds.iter().zip(self.upper_bounds.iter()) {
+        for (lower, upper) in self.lower_bounds.iter().zip(self.upper_bounds.iter()) {
             center.push((lower + upper) / 2.0)
         };
 
@@ -131,7 +131,12 @@ impl Geometry<f64> for BoundingBox {
     }
 
     fn shape(&self) -> Vec<f64> {
-        todo!()
+        let mut shape: Vec<f64> = vec![];
+        for (lower, upper) in self.lower_bounds.iter().zip(self.upper_bounds.iter()) {
+            shape.push(upper - lower)
+        }
+
+        shape
     }
 
     fn width_of(&self, dim: usize) -> Result<f64, IndexOutOfBoundsError> {
