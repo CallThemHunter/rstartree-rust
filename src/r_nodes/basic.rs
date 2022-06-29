@@ -7,13 +7,17 @@ pub enum Children<'a, T> {
 }
 
 pub struct Node<'a, T> {
-    bounds: BoundingBox<T>,
-    parent: Option<&'a Node<'a, T>>,
-    children: Children<'a, T>,
+    pub bounds: BoundingBox<T>,
+    pub parent: Option<&'a Node<'a, T>>,
+    pub children: Children<'a, T>,
 }
 
-trait Searchable<T> {
-    fn search(&self) -> Option<T>;
+pub trait TreeManipulation<T>: TreeState {
+    fn insert(&self, element: BoundingBox<T>);
+
+    fn remove(&self, element: BoundingBox<T>) -> bool;
+
+    fn query(&self, element: BoundingBox<T>) -> bool;
 }
 
 pub trait TreeState {
