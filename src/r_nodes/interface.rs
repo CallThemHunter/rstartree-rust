@@ -22,11 +22,26 @@ pub struct Node<'a, D, R> {
 
 
 pub trait NodeManipulation<D>: NodeState {
-    fn insert(&self, element: BoundingBox<D>);
+    fn insert(&mut self, element: BoundingBox<D>);
 
-    fn remove(&self, element: BoundingBox<D>) -> bool;
+    fn remove(&mut self, element: BoundingBox<D>) -> bool;
 
     fn query(&self, element: BoundingBox<D>) -> bool;
+}
+
+
+pub trait NodeTraversal<D, R> {
+    fn root(&self) -> &Node<D, R>;
+}
+
+
+impl<D, R> NodeTraversal<D, R> for Node<'_, D, R> {
+    fn root(&self) -> &Node<D, R> {
+        match &self.parent {
+            Tree(_) => self,
+            NodeInst(node) => node.root()
+        }
+    }
 }
 
 
