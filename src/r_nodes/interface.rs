@@ -1,5 +1,5 @@
 use crate::bounding_box::interface::BoundingBox;
-use crate::r_nodes::basic::Children::{Boxes, Nodes};
+use crate::r_nodes::interface::Children::{Boxes, Nodes};
 
 pub enum Children<'a, T> {
     Boxes(Vec<BoundingBox<T>>),
@@ -12,7 +12,7 @@ pub struct Node<'a, T> {
     pub children: Children<'a, T>,
 }
 
-pub trait TreeManipulation<T>: TreeState {
+pub trait NodeManipulation<T>: NodeState {
     fn insert(&self, element: BoundingBox<T>);
 
     fn remove(&self, element: BoundingBox<T>) -> bool;
@@ -20,7 +20,7 @@ pub trait TreeManipulation<T>: TreeState {
     fn query(&self, element: BoundingBox<T>) -> bool;
 }
 
-pub trait TreeState {
+pub trait NodeState {
     fn depth(&self) -> usize;
 
     fn height(&self) -> usize;
@@ -34,7 +34,7 @@ pub trait TreeState {
     fn num_nodes(&self) -> usize;
 }
 
-impl<T> TreeState for Node<'_, T> {
+impl<T> NodeState for Node<'_, T> {
     fn depth(&self) -> usize {
         match self.parent {
             None => 0,
