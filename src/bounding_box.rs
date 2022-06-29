@@ -17,13 +17,16 @@ struct BoundingBox {
 
 impl Display for BoundingBox {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        todo!()
+        write!(f, "Bbox: size ({:?}) at ({:?})", &self.lower_bounds, &self.shape())
     }
 }
 
 impl Debug for BoundingBox {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        todo!()
+        f.debug_struct("BoundingBox")
+            .field("lower", &self.lower_bounds)
+            .field("upper", &self.upper_bounds)
+            .finish()
     }
 }
 
