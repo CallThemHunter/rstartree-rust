@@ -1,5 +1,6 @@
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
+use std::iter::zip;
 
 struct IndexOutOfBoundsError;
 
@@ -106,7 +107,19 @@ impl Overlap<f64> for BoundingBox {
     }
 
     fn encloses(&self, other: &Self) -> bool {
-        todo!()
+        for (own_bound, other_bound) in zip(&self.lower_bounds, &other.lower_bounds) {
+            if other_bound < own_bound {
+                return false
+            }
+        }
+
+        for (own_bound, other_bound) in zip(&self.upper_bounds, &other.upper_bounds) {
+            if other_bound > own_bound {
+                return false
+            }
+        }
+
+        true
     }
 }
 
