@@ -1,24 +1,34 @@
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::Children::{Boxes, Nodes};
+use crate::r_nodes::interface::Parent::{NodeInst, Tree};
 
-pub enum Children<'a, T> {
-    Boxes(Vec<BoundingBox<T>>),
-    Nodes(Vec<&'a Node<'a, T>>),
+pub enum Children<'a, D, R> {
+    Boxes(Vec<BoundingBox<D>>),
+    Nodes(Vec<&'a Node<'a, D, R>>),
 }
 
-pub struct Node<'a, T> {
-    pub bounds: BoundingBox<T>,
-    pub parent: Option<&'a Node<'a, T>>,
-    pub children: Children<'a, T>,
+
+pub enum Parent<'a, D, R> {
+    Tree(R),
+    NodeInst(Box<Node<'a, D, R>>),
 }
 
-pub trait NodeManipulation<T>: NodeState {
-    fn insert(&self, element: BoundingBox<T>);
 
-    fn remove(&self, element: BoundingBox<T>) -> bool;
-
-    fn query(&self, element: BoundingBox<T>) -> bool;
+pub struct Node<'a, D, R> {
+    pub bounds: BoundingBox<D>,
+    pub parent: Parent<'a, D, R>,
+    pub children: Children<'a, D, R>,
 }
+
+
+pub trait NodeManipulation<D>: NodeState {
+    fn insert(&self, element: BoundingBox<D>);
+
+    fn remove(&self, element: BoundingBox<D>) -> bool;
+
+    fn query(&self, element: BoundingBox<D>) -> bool;
+}
+
 
 pub trait NodeState {
     fn depth(&self) -> usize;
@@ -34,11 +44,12 @@ pub trait NodeState {
     fn num_nodes(&self) -> usize;
 }
 
-impl<T> NodeState for Node<'_, T> {
+
+impl<D, R> NodeState for Node<'_, D, R> {
     fn depth(&self) -> usize {
-        match self.parent {
-            None => 0,
-            Some(n) => 1 + n.depth()
+        match &self.parent {
+            Tree(_) => 0,
+            NodeInst(n) => 1 + n.depth()
         }
     }
 
@@ -64,7 +75,10 @@ impl<T> NodeState for Node<'_, T> {
     }
 
     fn is_root(&self) -> bool {
-        self.parent.is_none()
+        match &self.parent {
+            Tree(_) => true,
+            NodeInst(_) => false,
+        }
     }
 
     fn num_elements(&self) -> usize {
