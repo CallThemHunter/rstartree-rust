@@ -135,7 +135,7 @@ trait Geometry<T> {
 
     fn width_of(&self, dim: usize) -> Result<f64, IndexOutOfBoundsError>;
 
-    fn asymmetry(&self, other: &Self, dim: usize) -> f64;
+    fn asymmetry(&self, other: &Self, dim: usize) -> Result<f64, IndexOutOfBoundsError>;
 }
 
 impl Geometry<f64> for BoundingBox {
@@ -189,7 +189,20 @@ impl Geometry<f64> for BoundingBox {
         Ok(upper - lower)
     }
 
-    fn asymmetry(&self, other: &Self, dim: usize) -> f64 {
-        todo!()
+    fn asymmetry(&self, other: &Self, dim: usize) -> Result<f64, IndexOutOfBoundsError> {
+        let center_self = match self.center_along(dim) {
+            Err(E) => return Err(E),
+            Ok(x) => x,
+        };
+        let center_other = match other.center_along(dim) {
+            Err(E) => return Err(E),
+            Ok(x) => x,
+        };
+        let width_self_on_dim = match self.width_of(dim) {
+            Err(E) => return Err(E),
+            Ok(x) => x,
+        };
+
+        Ok(2.0 * (center_self - center_other) / f64::max(0.5, width_self_on_dim))
     }
 }
