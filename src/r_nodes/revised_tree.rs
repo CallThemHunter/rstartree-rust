@@ -1,8 +1,8 @@
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::{Node, NodeManipulation, NodeState};
 
-struct RRSTree<'a, T> {
-    root: Node<'a, T>,
+struct RRSTree<'a, D> {
+    root: Box<Node<'a, D, Self>>,
     config: RRSTreeConfig,
 }
 
@@ -45,9 +45,11 @@ impl NodeManipulation<f64> for RRSTree<'_, f64> {
     fn insert(&self, element: BoundingBox<f64>) {
         self.root.insert(element)
     }
+
     fn remove(&self, element: BoundingBox<f64>) -> bool {
         self.root.remove(element)
     }
+
     fn query(&self, element: BoundingBox<f64>) -> bool {
         self.root.query(element)
     }
