@@ -1,26 +1,14 @@
 use crate::bounding_box::interface::BoundingBox;
-use crate::r_nodes::basic::{Node, TreeManipulation, TreeState};
+use crate::r_nodes::interface::{Node, NodeManipulation, NodeState};
 
-struct Tree<'a, T> {
-    root: Node<'a, T>,
-    config: TreeConfig,
-}
-
-
-struct TreeConfig {
-    min_elems: f64,
-    max_elems: f64,
-    shape_param: f64,
-}
-
-
-trait RevisedTreeSplits<T> {
+trait NodeSplits<T> {
     fn split_needed(&self) -> bool;
 
     fn split_node(&self);
 }
 
-impl RevisedTreeSplits<f64> for Node<'_, f64> {
+
+impl NodeSplits<f64> for Node<'_, f64> {
     fn split_needed(&self) -> bool {
         todo!()
     }
@@ -30,7 +18,8 @@ impl RevisedTreeSplits<f64> for Node<'_, f64> {
     }
 }
 
-impl TreeManipulation<f64> for Node<'_, f64> {
+
+impl NodeManipulation<f64> for Node<'_, f64> {
     fn insert(&self, element: BoundingBox<f64>) {
         if self.is_leaf() {
             if self.split_needed() {
@@ -56,3 +45,5 @@ impl TreeManipulation<f64> for Node<'_, f64> {
         todo!()
     }
 }
+
+
