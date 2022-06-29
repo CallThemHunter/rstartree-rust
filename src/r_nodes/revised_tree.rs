@@ -42,11 +42,11 @@ impl NodeState for RRSTree<'_, f64> {
 
 
 impl NodeManipulation<f64> for RRSTree<'_, f64> {
-    fn insert(&self, element: BoundingBox<f64>) {
+    fn insert(&mut self, element: BoundingBox<f64>) {
         self.root.insert(element)
     }
 
-    fn remove(&self, element: BoundingBox<f64>) -> bool {
+    fn remove(&mut self, element: BoundingBox<f64>) -> bool {
         self.root.remove(element)
     }
 
