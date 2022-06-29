@@ -1,14 +1,14 @@
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::{Node, NodeManipulation, NodeState};
 
-trait NodeSplits<T> {
+trait NodeSplits<D> {
     fn split_needed(&self) -> bool;
 
     fn split_node(&self);
 }
 
 
-impl NodeSplits<f64> for Node<'_, f64> {
+impl<D, R> NodeSplits<f64> for Node<'_, D, R> {
     fn split_needed(&self) -> bool {
         todo!()
     }
@@ -19,7 +19,7 @@ impl NodeSplits<f64> for Node<'_, f64> {
 }
 
 
-impl NodeManipulation<f64> for Node<'_, f64> {
+impl<D, R> NodeManipulation<f64> for Node<'_, D, R> {
     fn insert(&self, element: BoundingBox<f64>) {
         if self.is_leaf() {
             if self.split_needed() {
@@ -45,5 +45,3 @@ impl NodeManipulation<f64> for Node<'_, f64> {
         todo!()
     }
 }
-
-
