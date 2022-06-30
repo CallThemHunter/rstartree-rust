@@ -21,7 +21,7 @@ pub struct Node<'a, D, R> {
 }
 
 
-pub trait NodeManipulation<'a, D>: NodeState {
+pub trait NodeManipulation<'a, D>: NodeState<D> {
     fn insert(&'a mut self, element: BoundingBox<D>);
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool;
@@ -33,28 +33,34 @@ pub trait NodeManipulation<'a, D>: NodeState {
 pub trait NodeTraversal<'a, D, R> {
     fn root(&self) -> &Node<D, R>;
 
-    fn root_mut<'b: 'a>(&'b mut self) -> &mut Node<'b, D, R>;
+    fn root_mut(&mut self) -> &mut Node<'a, D, R>;
 }
 
 
-impl<'node, D, R> NodeTraversal<'node, D, R> for Node<'node, D, R> {
+impl<'a, D, R> NodeTraversal<'a, D, R> for Node<'a, D, R> {
     fn root(&self) -> &Node<D, R> {
-        match &self.parent {
-            Tree(_) => self,
-            NodeInst(node) => node.root()
+        let mut parent = &self.parent;
+        loop {
+            match parent {
+                Tree(_) => { return self }
+                NodeInst(node) => { parent = &node.parent }
+            }
         }
     }
 
-    fn root_mut<'out: 'node>(&'out mut self) -> &mut Node<'out, D, R> {
-        match &mut self.parent {
-            Tree(_) => self,
-            NodeInst(node) => node.root_mut()
+    fn root_mut(&mut self) -> &mut Node<'a, D, R> {
+        let mut parent = &mut self.parent;
+        loop {
+            match parent {
+                Tree(_) => { return self }
+                NodeInst(node) => { parent = &mut node.parent }
+            }
         }
     }
 }
 
 
-pub trait NodeState {
+pub trait NodeState<D> {
     fn depth(&self) -> usize;
 
     fn height(&self) -> usize;
@@ -66,10 +72,12 @@ pub trait NodeState {
     fn num_elements(&self) -> usize;
 
     fn num_nodes(&self) -> usize;
+
+    fn update_bounds(&self, element: &BoundingBox<D>);
 }
 
 
-impl<'a, D, R> NodeState for Node<'a, D, R> {
+impl<'a, D, R> NodeState<D> for Node<'a, D, R> {
     fn depth(&self) -> usize {
         match &self.parent {
             Tree(_) => 0,
@@ -124,5 +132,9 @@ impl<'a, D, R> NodeState for Node<'a, D, R> {
                 .sum(),
             Boxes(_) => 1
         }
+    }
+
+    fn update_bounds(&self, element: &BoundingBox<D>) {
+        todo!()
     }
 }
