@@ -1,4 +1,3 @@
-use crate::bounding_box;
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::{Children, Node, NodeManipulation, NodeTraversal};
 
@@ -9,7 +8,7 @@ trait NodeHeuristics<'a, D, R> {
 
     fn lower_check(&self);
 
-    fn choose_subtree(&self) -> Node<'a, D, R>;
+    fn choose_subtree(&self, nodes: &Vec<&Node<'a, D, R>>) -> Node<'a, D, R>;
 }
 
 
@@ -24,7 +23,7 @@ impl<'a, D, R> NodeHeuristics<'a, D, R> for Node<'a, D, R> {
 
     fn lower_check(&self) { todo!() }
 
-    fn choose_subtree(&self) -> Node<'a, D, R> { todo!() }
+    fn choose_subtree(&self, nodes: &Vec<&Node<'a, D, R>>) -> Node<'a, D, R> { todo!() }
 }
 
 
@@ -40,6 +39,7 @@ impl<'a, D, R> NodeManipulation<'a, D> for Node<'a, D, R> {
                 } else {
                     self.lower_check();
                     boxes.push(element);
+                    return
                 }
             }
             Children::Nodes(mut nodes) => {
@@ -47,12 +47,15 @@ impl<'a, D, R> NodeManipulation<'a, D> for Node<'a, D, R> {
                     self.split_node();
 
                     self.root().insert(element);
+                    return
                 } else {
-                    let &mut child = &mut self.choose_subtree();
+                    let child = &mut self.choose_subtree(nodes.as_ref());
+
+                    child.insert(element);
+                    return
                 }
             }
         }
-        todo!()
     }
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool {
