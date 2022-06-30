@@ -1,20 +1,20 @@
+use crate::bounding_box;
 use crate::bounding_box::interface::BoundingBox;
-use crate::r_nodes::interface::{Children, Node, NodeManipulation, NodeState, NodeTraversal};
-use crate::r_nodes::interface::Parent::Tree;
+use crate::r_nodes::interface::{Children, Node, NodeManipulation, NodeTraversal};
 
-trait NodeHeuristics<D, R> {
-    fn split_needed(&mut self) -> bool;
+trait NodeHeuristics<'a, D, R> {
+    fn split_needed(&self) -> bool;
 
     fn split_node(&self);
 
     fn lower_check(&self);
 
-    fn choose_subtree(&self) -> Node<'_, D, R>;
+    fn choose_subtree(&self) -> Node<'a, D, R>;
 }
 
 
-impl<D, R> NodeHeuristics<D, R> for Node<'_, D, R> {
-    fn split_needed(&mut self) -> bool {
+impl<'a, D, R> NodeHeuristics<'a, D, R> for Node<'a, D, R> {
+    fn split_needed(&self) -> bool {
         todo!()
     }
 
@@ -24,25 +24,25 @@ impl<D, R> NodeHeuristics<D, R> for Node<'_, D, R> {
 
     fn lower_check(&self) { todo!() }
 
-    fn choose_subtree(&self) -> Node<'_, D, R> { todo!() }
+    fn choose_subtree(&self) -> Node<'a, D, R> { todo!() }
 }
 
 
-impl<D, R> NodeManipulation<D> for Node<'_, D, R> {
-    fn insert(&mut self, element: BoundingBox<D>) {
-        match &mut self.children {
-            Children::Boxes(boxes) => {
+impl<'a, D, R> NodeManipulation<'a, D> for Node<'a, D, R> {
+    fn insert(&'a mut self, element: BoundingBox<D>) {
+        match &self.children {
+            Children::Boxes(mut boxes) => {
                 if self.split_needed() {
                     self.split_node();
 
-                    self.root().insert(element);
+                    self.root_mut().insert(element);
                     return
                 } else {
                     self.lower_check();
                     boxes.push(element);
                 }
             }
-            Children::Nodes(nodes) => {
+            Children::Nodes(mut nodes) => {
                 if self.split_needed() {
                     self.split_node();
 
