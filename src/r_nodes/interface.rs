@@ -21,8 +21,8 @@ pub struct Node<'a, D, R> {
 }
 
 
-pub trait NodeManipulation<D>: NodeState {
-    fn insert(&mut self, element: BoundingBox<D>);
+pub trait NodeManipulation<'a, D>: NodeState {
+    fn insert(&'a mut self, element: BoundingBox<D>);
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool;
 
@@ -30,16 +30,25 @@ pub trait NodeManipulation<D>: NodeState {
 }
 
 
-pub trait NodeTraversal<D, R> {
+pub trait NodeTraversal<'a, D, R> {
     fn root(&self) -> &Node<D, R>;
+
+    fn root_mut<'b: 'a>(&'b mut self) -> &mut Node<'b, D, R>;
 }
 
 
-impl<D, R> NodeTraversal<D, R> for Node<'_, D, R> {
+impl<'node, D, R> NodeTraversal<'node, D, R> for Node<'node, D, R> {
     fn root(&self) -> &Node<D, R> {
         match &self.parent {
             Tree(_) => self,
             NodeInst(node) => node.root()
+        }
+    }
+
+    fn root_mut<'out: 'node>(&'out mut self) -> &mut Node<'out, D, R> {
+        match &mut self.parent {
+            Tree(_) => self,
+            NodeInst(node) => node.root_mut()
         }
     }
 }
@@ -60,7 +69,7 @@ pub trait NodeState {
 }
 
 
-impl<D, R> NodeState for Node<'_, D, R> {
+impl<'a, D, R> NodeState for Node<'a, D, R> {
     fn depth(&self) -> usize {
         match &self.parent {
             Tree(_) => 0,
