@@ -14,7 +14,7 @@ struct RRSTreeConfig {
 }
 
 
-impl NodeState for RRSTree<'_, f64> {
+impl<'a> NodeState for RRSTree<'a, f64> {
     fn depth(&self) -> usize {
         0
     }
@@ -41,8 +41,8 @@ impl NodeState for RRSTree<'_, f64> {
 }
 
 
-impl NodeManipulation<f64> for RRSTree<'_, f64> {
-    fn insert(&mut self, element: BoundingBox<f64>) {
+impl<'a> NodeManipulation<'a, f64> for RRSTree<'a, f64> {
+    fn insert(&'a mut self, element: BoundingBox<f64>) {
         self.root.insert(element)
     }
 
