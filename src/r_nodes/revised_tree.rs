@@ -14,7 +14,7 @@ struct RRSTreeConfig {
 }
 
 
-impl<'a> NodeState for RRSTree<'a, f64> {
+impl<'a> NodeState<f64> for RRSTree<'a, f64> {
     fn depth(&self) -> usize {
         0
     }
@@ -37,6 +37,10 @@ impl<'a> NodeState for RRSTree<'a, f64> {
 
     fn num_nodes(&self) -> usize {
         self.root.num_nodes()
+    }
+
+    fn update_bounds(&self, element: &BoundingBox<f64>) {
+        return
     }
 }
 
