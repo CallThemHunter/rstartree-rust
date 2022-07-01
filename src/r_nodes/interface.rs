@@ -2,27 +2,27 @@ use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::Children::{Boxes, Nodes};
 use crate::r_nodes::interface::Parent::{NodeInst, Tree};
 
-pub enum Children<'a, D, R> {
+pub enum Children<D, R> {
     Boxes(Vec<BoundingBox<D>>),
-    Nodes(Vec<&'a Node<'a, D, R>>),
+    Nodes(Vec<Node<D, R>>),
 }
 
 
-pub enum Parent<'a, D, R> {
+pub enum Parent<D, R> {
     Tree(R),
-    NodeInst(Box<Node<'a, D, R>>),
+    NodeInst(Box<Node<D, R>>),
 }
 
 
-pub struct Node<'a, D, R> {
+pub struct Node<D, R> {
     pub bounds: BoundingBox<D>,
-    pub parent: Parent<'a, D, R>,
-    pub children: Children<'a, D, R>,
+    pub parent: Parent<D, R>,
+    pub children: Children<D, R>,
 }
 
 
-pub trait NodeManipulation<'a, D>: NodeState<D> {
-    fn insert(&'a mut self, element: BoundingBox<D>);
+pub trait NodeManipulation<D>: NodeState<D> {
+    fn insert(&mut self, element: BoundingBox<D>);
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool;
 
@@ -30,14 +30,14 @@ pub trait NodeManipulation<'a, D>: NodeState<D> {
 }
 
 
-pub trait NodeTraversal<'a, D, R> {
+pub trait NodeTraversal<D, R> {
     fn root(&self) -> &Node<D, R>;
 
-    fn root_mut(&mut self) -> &mut Node<'a, D, R>;
+    fn root_mut(&mut self) -> &mut Node<D, R>;
 }
 
 
-impl<'a, D, R> NodeTraversal<'a, D, R> for Node<'a, D, R> {
+impl<D, R> NodeTraversal<D, R> for Node<D, R> {
     fn root(&self) -> &Node<D, R> {
         let mut parent = &self.parent;
         loop {
@@ -48,7 +48,7 @@ impl<'a, D, R> NodeTraversal<'a, D, R> for Node<'a, D, R> {
         }
     }
 
-    fn root_mut(&mut self) -> &mut Node<'a, D, R> {
+    fn root_mut(&mut self) -> &mut Node<D, R> {
         let mut parent = &mut self.parent;
         loop {
             match parent {
@@ -77,7 +77,7 @@ pub trait NodeState<D> {
 }
 
 
-impl<'a, D, R> NodeState<D> for Node<'a, D, R> {
+impl<D, R> NodeState<D> for Node<D, R> {
     fn depth(&self) -> usize {
         match &self.parent {
             Tree(_) => 0,
