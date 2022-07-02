@@ -1,27 +1,38 @@
+use std::borrow::Borrow;
+use std::cell::RefCell;
+use std::ops::{Deref, DerefMut};
+use std::rc::Rc;
+
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::Children::{Boxes, Nodes};
 use crate::r_nodes::interface::Parent::{NodeInst, Tree};
 
+#[derive(Debug)]
 pub enum Children<D, R> {
     Boxes(Vec<BoundingBox<D>>),
     Nodes(Vec<Node<D, R>>),
 }
 
 
+#[derive(Debug)]
 pub enum Parent<D, R> {
     Tree(R),
-    NodeInst(Box<Node<D, R>>),
+    NodeInst(Node<D, R>),
 }
 
 
+pub type NodeLink<T> = Rc<RefCell<T>>;
+
+
+#[derive(Debug)]
 pub struct Node<D, R> {
     pub bounds: BoundingBox<D>,
-    pub parent: Parent<D, R>,
-    pub children: Children<D, R>,
+    pub parent: NodeLink<Parent<D, R>>,
+    pub children: NodeLink<Children<D, R>>,
 }
 
 
-pub trait NodeManipulation<D>: NodeState<D> {
+pub trait NodeManipulation<D, R>: NodeCore<D, R> {
     fn insert(&mut self, element: BoundingBox<D>);
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool;
@@ -30,37 +41,7 @@ pub trait NodeManipulation<D>: NodeState<D> {
 }
 
 
-pub trait NodeTraversal<D, R> {
-    fn root(&self) -> &Node<D, R>;
-
-    fn root_mut(&mut self) -> &mut Node<D, R>;
-}
-
-
-impl<D, R> NodeTraversal<D, R> for Node<D, R> {
-    fn root(&self) -> &Node<D, R> {
-        let mut parent = &self.parent;
-        loop {
-            match parent {
-                Tree(_) => { return self }
-                NodeInst(node) => { parent = &node.parent }
-            }
-        }
-    }
-
-    fn root_mut(&mut self) -> &mut Node<D, R> {
-        let mut parent = &mut self.parent;
-        loop {
-            match parent {
-                Tree(_) => { return self }
-                NodeInst(node) => { parent = &mut node.parent }
-            }
-        }
-    }
-}
-
-
-pub trait NodeState<D> {
+pub trait NodeCore<D, R> {
     fn depth(&self) -> usize;
 
     fn height(&self) -> usize;
@@ -74,12 +55,20 @@ pub trait NodeState<D> {
     fn num_nodes(&self) -> usize;
 
     fn update_bounds(&self, element: &BoundingBox<D>);
+
+    fn remake(self) -> Node<D, R>;
+
+    fn root(&self) -> &Node<D, R>;
+
+    fn root_mut(&mut self) -> &mut Node<D, R>;
 }
 
 
-impl<D, R> NodeState<D> for Node<D, R> {
+impl<D, R> NodeCore<D, R> for Node<D, R> {
     fn depth(&self) -> usize {
-        match &self.parent {
+        let cell: &RefCell<Parent<D, R>> = Borrow::borrow(&self.parent);
+
+        match RefCell::borrow(cell).deref() {
             Tree(_) => 0,
             NodeInst(n) => 1 + n.depth()
         }
@@ -88,7 +77,9 @@ impl<D, R> NodeState<D> for Node<D, R> {
     fn height(&self) -> usize {
         // r trees are always balanced!
         // so you can use the first node on a list always
-        match &self.children {
+
+        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
+        match RefCell::borrow(borrowed).deref() {
             Boxes(_) => 1,
             Nodes(n) => {
                 match n.first() {
@@ -100,21 +91,24 @@ impl<D, R> NodeState<D> for Node<D, R> {
     }
 
     fn is_leaf(&self) -> bool {
-        match &self.children {
+        let borrowed: &RefCell<Children<D, R>> = Borrow::borrow(&self.children);
+        match RefCell::borrow(borrowed).deref() {
             Nodes(_) => false,
             Boxes(_) => true
         }
     }
 
     fn is_root(&self) -> bool {
-        match &self.parent {
+        let borrowed: &RefCell<Parent<D, R>> = self.parent.borrow();
+        match RefCell::borrow(borrowed).deref() {
             Tree(_) => true,
             NodeInst(_) => false,
         }
     }
 
     fn num_elements(&self) -> usize {
-        match &self.children {
+        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
+        match RefCell::borrow(borrowed).deref() {
             Nodes(nodes)
             => nodes
                 .iter()
@@ -125,7 +119,8 @@ impl<D, R> NodeState<D> for Node<D, R> {
     }
 
     fn num_nodes(&self) -> usize {
-        match &self.children {
+        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
+        match RefCell::borrow(borrowed).deref() {
             Nodes(nodes)
             => nodes.iter()
                 .map(|node| { node.num_nodes() })
@@ -136,5 +131,37 @@ impl<D, R> NodeState<D> for Node<D, R> {
 
     fn update_bounds(&self, element: &BoundingBox<D>) {
         todo!()
+    }
+
+    fn remake(self) -> Node<D, R> {
+        let bounds = self.bounds;
+        let parent = self.parent;
+        let children = self.children;
+
+        Node { bounds, parent, children }
+    }
+
+    fn root(&self) -> &Node<D, R> {
+        let cell: &RefCell<Parent<D, R>> = Rc::borrow(&self.parent);
+        let mut parent = RefCell::borrow(cell);
+        loop {
+            match parent.deref() {
+                Tree(_) => { return self }
+                NodeInst(node) => {
+                    let parent_cell: &RefCell<Parent<D, R>> = Rc::borrow(&node.parent);
+                    parent = RefCell::borrow(parent_cell);
+                }
+            }
+        }
+    }
+
+    fn root_mut(&mut self) -> &mut Node<D, R> {
+        let mut parent = &mut self.parent.clone().into_inner();
+        loop {
+            match parent.deref_mut() {
+                Tree(_) => { return self }
+                NodeInst(node) => { parent = &mut node.parent.clone().into_inner() }
+            }
+        }
     }
 }
