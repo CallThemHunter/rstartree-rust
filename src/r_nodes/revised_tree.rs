@@ -1,12 +1,14 @@
 use crate::bounding_box::interface::BoundingBox;
-use crate::r_nodes::interface::{Node, NodeManipulation, NodeState};
+use crate::r_nodes::interface::{Node, NodeCore, NodeLink, NodeManipulation};
 
-struct RRSTree<'a, D> {
-    root: Box<Node<'a, D, Self>>,
+#[derive(Debug)]
+struct RRSTree<D> {
+    root: Node<D, Self>,
     config: RRSTreeConfig,
 }
 
 
+#[derive(Debug)]
 struct RRSTreeConfig {
     min_elems: f64,
     max_elems: f64,
@@ -14,7 +16,7 @@ struct RRSTreeConfig {
 }
 
 
-impl<'a> NodeState<f64> for RRSTree<'a, f64> {
+impl<D> NodeCore<D, RRSTree<D>> for RRSTree<D> {
     fn depth(&self) -> usize {
         0
     }
@@ -39,22 +41,34 @@ impl<'a> NodeState<f64> for RRSTree<'a, f64> {
         self.root.num_nodes()
     }
 
-    fn update_bounds(&self, element: &BoundingBox<f64>) {
+    fn update_bounds(&self, element: &BoundingBox<D>) {
         return
+    }
+
+    fn remake(self) -> Node<D, Self> {
+        todo!()
+    }
+
+    fn root(&self) -> &Node<D, Self> {
+        &self.root
+    }
+
+    fn root_mut(&mut self) -> &mut Node<D, Self> {
+        &mut self.root
     }
 }
 
 
-impl<'a> NodeManipulation<'a, f64> for RRSTree<'a, f64> {
-    fn insert(&'a mut self, element: BoundingBox<f64>) {
+impl<D> NodeManipulation<D, RRSTree<D>> for RRSTree<D> {
+    fn insert(&mut self, element: BoundingBox<D>) {
         self.root.insert(element)
     }
 
-    fn remove(&mut self, element: BoundingBox<f64>) -> bool {
+    fn remove(&mut self, element: BoundingBox<D>) -> bool {
         self.root.remove(element)
     }
 
-    fn query(&self, element: BoundingBox<f64>) -> bool {
+    fn query(&self, element: BoundingBox<D>) -> bool {
         self.root.query(element)
     }
 }
