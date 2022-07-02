@@ -1,5 +1,5 @@
 use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
+use std::fmt::{Display, Formatter};
 use std::iter::zip;
 
 use crate::bounding_box::interface::{BoundingBox, Geometry, HasMargin,
@@ -8,15 +8,6 @@ use crate::bounding_box::interface::{BoundingBox, Geometry, HasMargin,
 impl Display for BoundingBox<f64> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "Bbox: size ({:?}) at ({:?})", &self.lower_bounds, &self.shape())
-    }
-}
-
-impl Debug for BoundingBox<f64> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BoundingBox")
-            .field("lower", &self.lower_bounds)
-            .field("upper", &self.upper_bounds)
-            .finish()
     }
 }
 
