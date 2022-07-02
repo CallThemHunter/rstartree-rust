@@ -1,5 +1,6 @@
 use std::fmt::{self, Display, Formatter};
 
+#[derive(Debug)]
 pub struct BoundingBox<T> {
     pub lower_bounds: Vec<T>,
     pub upper_bounds: Vec<T>,
