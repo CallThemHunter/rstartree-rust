@@ -33,7 +33,7 @@ pub struct Node<D, R> {
 
 
 pub trait NodeManipulation<D, R>: NodeCore<D, R> {
-    fn insert(&mut self, element: BoundingBox<D>);
+    fn insert(&self, element: BoundingBox<D>);
 
     fn remove(&mut self, element: BoundingBox<D>) -> bool;
 

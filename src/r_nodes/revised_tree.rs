@@ -49,6 +49,22 @@ impl<D> NodeCore<D, RRSTree<D>> for RRSTree<D> {
         todo!()
     }
 
+    fn parent(&self) -> Ref<Parent<D, RRSTree<D>>> {
+        todo!()
+    }
+
+    fn parent_mut(&self) -> RefMut<Parent<D, RRSTree<D>>> {
+        todo!()
+    }
+
+    fn children(&self) -> Ref<Children<D, RRSTree<D>>> {
+        todo!()
+    }
+
+    fn children_mut(&self) -> RefMut<Children<D, RRSTree<D>>> {
+        todo!()
+    }
+
     fn root(&self) -> &Node<D, Self> {
         &self.root
     }
@@ -60,7 +76,7 @@ impl<D> NodeCore<D, RRSTree<D>> for RRSTree<D> {
 
 
 impl<D> NodeManipulation<D, RRSTree<D>> for RRSTree<D> {
-    fn insert(&mut self, element: BoundingBox<D>) {
+    fn insert(&self, element: BoundingBox<D>) {
         self.root.insert(element)
     }
 
