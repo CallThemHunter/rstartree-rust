@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::{Children, Node, NodeCore, NodeManipulation};
 
@@ -29,12 +31,11 @@ impl<D, R> NodeHeuristics<D, R> for Node<D, R> {
 
 // a bit messy for now
 impl<D, R> NodeManipulation<D, R> for Node<D, R> {
-    fn insert(&mut self, element: BoundingBox<D>) {
+    fn insert(&self, element: BoundingBox<D>) {
         if self.split_needed() {
-            match &mut self.children.clone().into_inner() {
+            match self.children().deref() {
                 Children::Boxes(_) => {
                     self.split_node();
-
                     self.root().insert(element);
                     return
                 },
@@ -46,18 +47,18 @@ impl<D, R> NodeManipulation<D, R> for Node<D, R> {
                 }
             }
         } else {
-            match self.children.clone().into_inner() {
-                Children::Boxes(mut boxes) => {
-                    // self.lower_check();
-                    // boxes.push(element);
-                    // return
+            match self.children_mut().deref_mut() {
+                Children::Boxes(boxes) => {
+                    self.lower_check();
+                    boxes.push(element);
+                    return
                 },
                 Children::Nodes(nodes) => {
-                    // let mut child = self.choose_subtree(nodes).remake();
-                    // // let child = self.choose_subtree(nodes);
-                    //
-                    // child.insert(element);
-                    // return
+                    let mut child = self.choose_subtree(nodes);
+                    // let child = self.choose_subtree(nodes);
+
+                    nodes[child].insert(element);
+                    return
                 },
             }
         }
