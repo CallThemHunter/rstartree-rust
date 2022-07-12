@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::cell::{Ref, RefCell};
+use std::cell::{Ref, RefCell, RefMut};
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
@@ -170,13 +170,12 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     fn root(&self) -> Ref<Node<D, R>> {
         let mut parent = self.parent().deref();
         loop {
-            match parent.deref() {
-                Tree(_) => { return self }
-                NodeInst(node) => {
-                    let parent_cell: &RefCell<Parent<D, R>> = Rc::borrow(&node.parent);
-                    parent = RefCell::borrow(parent_cell);
-                }
-            }
+            // match parent {
+            //     Tree(_) => { self }
+            //     NodeInst(node) => {
+            //         node.root();
+            //     }
+            // }
         }
     }
 
@@ -185,10 +184,13 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
 
         let mut last_node: RefMut<Node<D, R>> = self;
         loop {
-            match parent.deref_mut() {
-                Tree(_) => { return self }
-                NodeInst(node) => { parent = &mut node.parent.clone().into_inner() }
-            }
+            // match parent.deref_mut() {
+            //     Tree(_) => { return last_node }
+            //     NodeInst(node) => {
+            //         parent = node.parent_mut();
+            //         last_node = parent;
+            //     }
+            // }
         }
     }
 }
