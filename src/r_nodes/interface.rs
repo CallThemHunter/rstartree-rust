@@ -66,9 +66,9 @@ pub trait NodeCore<D, R> {
 
     fn children_mut(&self) -> RefMut<Children<D, R>>;
 
-    fn root(&self) -> Ref<Node<D, R>>;
+    fn root(&self) -> &Node<D, R>;
 
-    fn root_mut(&mut self) -> RefMut<Node<D, R>>;
+    fn root_mut(&mut self) -> &mut Node<D, R>;
 }
 
 
@@ -167,30 +167,33 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         self.children.borrow_mut()
     }
 
-    fn root(&self) -> Ref<Node<D, R>> {
-        let mut parent = self.parent().deref();
+    fn root(&self) -> &Node<D, R> {
+        let mut parent = self.parent();
+        let mut last_node = self;
+
         loop {
-            // match parent {
-            //     Tree(_) => { self }
-            //     NodeInst(node) => {
-            //         node.root();
-            //     }
-            // }
+            match parent.deref() {
+                Tree(_) => { return last_node }
+                NodeInst(node) => {
+                    parent = node.parent();
+                    last_node = node;
+                }
+            }
         }
     }
 
-    fn root_mut(&mut self) -> RefMut<Node<D, R>> {
+    fn root_mut(&mut self) -> &mut Node<D, R> {
         let mut parent = self.parent_mut();
+        let mut last_node: &mut Node<D, R> = self;
 
-        let mut last_node: RefMut<Node<D, R>> = self;
         loop {
-            // match parent.deref_mut() {
-            //     Tree(_) => { return last_node }
-            //     NodeInst(node) => {
-            //         parent = node.parent_mut();
-            //         last_node = parent;
-            //     }
-            // }
+            match parent.deref_mut() {
+                Tree(_) => { return last_node }
+                NodeInst(node) => {
+                    parent = node.parent_mut();
+                    last_node = node;
+                }
+            }
         }
     }
 }
