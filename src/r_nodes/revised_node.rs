@@ -4,7 +4,7 @@ use crate::r_nodes::interface::{Children, Node, NodeCore, NodeManipulation};
 trait NodeHeuristics<D, R> {
     fn split_needed(&self) -> bool;
 
-    fn split_node(&mut self);
+    fn split_node(&self);
 
     fn lower_check(&self);
 
@@ -17,7 +17,7 @@ impl<D, R> NodeHeuristics<D, R> for Node<D, R> {
         todo!()
     }
 
-    fn split_node(&mut self) {
+    fn split_node(&self) {
         todo!()
     }
 
