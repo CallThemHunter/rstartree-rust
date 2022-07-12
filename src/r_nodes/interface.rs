@@ -58,7 +58,13 @@ pub trait NodeCore<D, R> {
 
     fn remake(self) -> Node<D, R>;
 
-    fn root(&self) -> &Node<D, R>;
+    fn parent(&self) -> Ref<Parent<D, R>>;
+
+    fn parent_mut(&self) -> RefMut<Parent<D, R>>;
+
+    fn children(&self) -> Ref<Children<D, R>>;
+
+    fn children_mut(&self) -> RefMut<Children<D, R>>;
 
     fn root_mut(&mut self) -> &mut Node<D, R>;
 }
@@ -141,9 +147,26 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         Node { bounds, parent, children }
     }
 
-    fn root(&self) -> &Node<D, R> {
-        let cell: &RefCell<Parent<D, R>> = Rc::borrow(&self.parent);
-        let mut parent = RefCell::borrow(cell);
+    fn parent(&self) -> Ref<Parent<D, R>> {
+        let cell: &RefCell<Parent<D, R>> = self.parent.borrow();
+        cell.deref().borrow()
+    }
+
+    fn parent_mut(&self) -> RefMut<Parent<D, R>> {
+        self.parent.borrow_mut()
+    }
+
+    fn children(&self) -> Ref<Children<D, R>> {
+        let cell: &RefCell<Children<D, R>> = self.children.borrow();
+        cell.deref().borrow()
+    }
+
+    fn children_mut(&self) -> RefMut<Children<D, R>> {
+        self.children.borrow_mut()
+    }
+
+    fn root(&self) -> Ref<Node<D, R>> {
+        let mut parent = self.parent().deref();
         loop {
             match parent.deref() {
                 Tree(_) => { return self }
