@@ -1,5 +1,5 @@
 use std::borrow::Borrow;
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
@@ -7,14 +7,14 @@ use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::Children::{Boxes, Nodes};
 use crate::r_nodes::interface::Parent::{NodeInst, Tree};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Children<D, R> {
     Boxes(Vec<BoundingBox<D>>),
     Nodes(Vec<Node<D, R>>),
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Parent<D, R> {
     Tree(R),
     NodeInst(Node<D, R>),
@@ -24,7 +24,7 @@ pub enum Parent<D, R> {
 pub type NodeLink<T> = Rc<RefCell<T>>;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Node<D, R> {
     pub bounds: BoundingBox<D>,
     pub parent: NodeLink<Parent<D, R>>,
