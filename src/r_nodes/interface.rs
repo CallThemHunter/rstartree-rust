@@ -74,9 +74,9 @@ pub trait NodeCore<D, R> {
 
 impl<D, R> NodeCore<D, R> for Node<D, R> {
     fn depth(&self) -> usize {
-        let cell: &RefCell<Parent<D, R>> = Borrow::borrow(&self.parent);
+        let parent = self.parent().deref();
 
-        match RefCell::borrow(cell).deref() {
+        match parent {
             Tree(_) => 0,
             NodeInst(n) => 1 + n.depth()
         }
@@ -86,8 +86,8 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         // r trees are always balanced!
         // so you can use the first node on a list always
 
-        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
-        match RefCell::borrow(borrowed).deref() {
+        let children = self.children().deref();
+        match children {
             Boxes(_) => 1,
             Nodes(n) => {
                 match n.first() {
@@ -99,24 +99,24 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn is_leaf(&self) -> bool {
-        let borrowed: &RefCell<Children<D, R>> = Borrow::borrow(&self.children);
-        match RefCell::borrow(borrowed).deref() {
+        let children = self.children().deref();
+        match children {
             Nodes(_) => false,
             Boxes(_) => true
         }
     }
 
     fn is_root(&self) -> bool {
-        let borrowed: &RefCell<Parent<D, R>> = self.parent.borrow();
-        match RefCell::borrow(borrowed).deref() {
+        let parent = self.parent().deref();
+        match parent {
             Tree(_) => true,
             NodeInst(_) => false,
         }
     }
 
     fn num_elements(&self) -> usize {
-        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
-        match RefCell::borrow(borrowed).deref() {
+        let children = self.children().deref();
+        match children {
             Nodes(nodes)
             => nodes
                 .iter()
@@ -127,8 +127,8 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn num_nodes(&self) -> usize {
-        let borrowed: &RefCell<Children<D, R>> = self.children.borrow();
-        match RefCell::borrow(borrowed).deref() {
+        let children = self.children().deref();
+        match children {
             Nodes(nodes)
             => nodes.iter()
                 .map(|node| { node.num_nodes() })
