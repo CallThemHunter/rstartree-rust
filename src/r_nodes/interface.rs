@@ -66,7 +66,9 @@ pub trait NodeCore<D, R> {
 
     fn children_mut(&self) -> RefMut<Children<D, R>>;
 
-    fn root_mut(&mut self) -> &mut Node<D, R>;
+    fn root(&self) -> Ref<Node<D, R>>;
+
+    fn root_mut(&mut self) -> RefMut<Node<D, R>>;
 }
 
 
@@ -178,8 +180,10 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         }
     }
 
-    fn root_mut(&mut self) -> &mut Node<D, R> {
-        let mut parent = &mut self.parent.clone().into_inner();
+    fn root_mut(&mut self) -> RefMut<Node<D, R>> {
+        let mut parent = self.parent_mut();
+
+        let mut last_node: RefMut<Node<D, R>> = self;
         loop {
             match parent.deref_mut() {
                 Tree(_) => { return self }

@@ -67,12 +67,12 @@ impl<D> NodeCore<D, RRSTree<D>> for RRSTree<D> {
         todo!()
     }
 
-    fn root(&self) -> &Node<D, Self> {
-        &self.root
+    fn root(&self) -> Ref<Node<D, Self>> {
+        todo!()
     }
 
-    fn root_mut(&mut self) -> &mut Node<D, Self> {
-        &mut self.root
+    fn root_mut(&mut self) -> RefMut<Node<D, Self>> {
+        todo!()
     }
 }
 
