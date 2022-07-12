@@ -1,14 +1,16 @@
-use crate::bounding_box::interface::BoundingBox;
-use crate::r_nodes::interface::{Node, NodeCore, NodeLink, NodeManipulation};
+use std::cell::{Ref, RefMut};
 
-#[derive(Debug)]
+use crate::bounding_box::interface::BoundingBox;
+use crate::r_nodes::interface::{Children, Node, NodeCore, NodeLink, NodeManipulation, Parent};
+
+#[derive(Debug, Clone)]
 struct RRSTree<D> {
     root: Node<D, Self>,
     config: RRSTreeConfig,
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct RRSTreeConfig {
     min_elems: f64,
     max_elems: f64,
