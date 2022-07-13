@@ -1,5 +1,4 @@
-use std::borrow::Borrow;
-use std::cell::{Ref, RefCell, RefMut};
+use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
@@ -58,13 +57,13 @@ pub trait NodeCore<D, R> {
 
     fn remake(self) -> Node<D, R>;
 
-    fn parent(&self) -> Ref<Parent<D, R>>;
+    fn parent(&self) -> &Parent<D, R>;
 
-    fn parent_mut(&self) -> RefMut<Parent<D, R>>;
+    fn parent_mut(&self) -> &mut Parent<D, R>;
 
-    fn children(&self) -> Ref<Children<D, R>>;
+    fn children(&self) -> &Children<D, R>;
 
-    fn children_mut(&self) -> RefMut<Children<D, R>>;
+    fn children_mut(&self) -> &mut Children<D, R>;
 
     fn root(&self) -> &Node<D, R>;
 
@@ -74,7 +73,7 @@ pub trait NodeCore<D, R> {
 
 impl<D, R> NodeCore<D, R> for Node<D, R> {
     fn depth(&self) -> usize {
-        let parent = self.parent().deref();
+        let parent = self.parent();
 
         match parent {
             Tree(_) => 0,
@@ -86,7 +85,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         // r trees are always balanced!
         // so you can use the first node on a list always
 
-        let children = self.children().deref();
+        let children = self.children();
         match children {
             Boxes(_) => 1,
             Nodes(n) => {
@@ -99,7 +98,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn is_leaf(&self) -> bool {
-        let children = self.children().deref();
+        let children = self.children();
         match children {
             Nodes(_) => false,
             Boxes(_) => true
@@ -107,7 +106,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn is_root(&self) -> bool {
-        let parent = self.parent().deref();
+        let parent = self.parent();
         match parent {
             Tree(_) => true,
             NodeInst(_) => false,
@@ -115,7 +114,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn num_elements(&self) -> usize {
-        let children = self.children().deref();
+        let children = self.children();
         match children {
             Nodes(nodes)
             => nodes
@@ -127,7 +126,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn num_nodes(&self) -> usize {
-        let children = self.children().deref();
+        let children = self.children();
         match children {
             Nodes(nodes)
             => nodes.iter()
@@ -149,22 +148,22 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         Node { bounds, parent, children }
     }
 
-    fn parent(&self) -> Ref<Parent<D, R>> {
-        let cell: &RefCell<Parent<D, R>> = self.parent.borrow();
-        cell.deref().borrow()
+    fn parent(&self) -> &Parent<D, R> {
+        //self.parent.borrow().deref()
     }
 
-    fn parent_mut(&self) -> RefMut<Parent<D, R>> {
-        self.parent.borrow_mut()
+    fn parent_mut(&self) -> &mut Parent<D, R> {
+        //self.parent.borrow_mut().deref_mut()
     }
 
-    fn children(&self) -> Ref<Children<D, R>> {
-        let cell: &RefCell<Children<D, R>> = self.children.borrow();
-        cell.deref().borrow()
+    fn children(&self) -> &Children<D, R> {
+        // let cell: &RefCell<Children<D, R>> = self.children.borrow();
+        // cell.deref().borrow()
+        //self.children.borrow().deref()
     }
 
-    fn children_mut(&self) -> RefMut<Children<D, R>> {
-        self.children.borrow_mut()
+    fn children_mut(&self) -> &mut Children<D, R> {
+        //self.children.borrow_mut().deref_mut()
     }
 
     fn root(&self) -> &Node<D, R> {
@@ -172,7 +171,7 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
         let mut last_node = self;
 
         loop {
-            match parent.deref() {
+            match parent {
                 Tree(_) => { return last_node }
                 NodeInst(node) => {
                     parent = node.parent();
@@ -183,17 +182,17 @@ impl<D, R> NodeCore<D, R> for Node<D, R> {
     }
 
     fn root_mut(&mut self) -> &mut Node<D, R> {
-        let mut parent = self.parent_mut();
-        let mut last_node: &mut Node<D, R> = self;
+        let mut parent = self.parent.borrow_mut().deref_mut();
+        let mut last_node: &mut Parent<D, R> = self.parent.borrow_mut().deref_mut();
 
         loop {
-            match parent.deref_mut() {
-                Tree(_) => { return last_node }
-                NodeInst(node) => {
-                    parent = node.parent_mut();
-                    last_node = node;
-                }
-            }
+            // match parent {
+            //     Tree(_) => { return last_node }
+            //     NodeInst(node) => {
+            //         parent = node.parent_mut();
+            //         last_node = ;
+            //     }
+            // }
         }
     }
 }

@@ -1,4 +1,4 @@
-use std::cell::{Ref, RefMut};
+use std::cell::{Ref, RefCell, RefMut};
 
 use crate::bounding_box::interface::BoundingBox;
 use crate::r_nodes::interface::{Children, Node, NodeCore, NodeLink, NodeManipulation, Parent};
@@ -51,19 +51,19 @@ impl<D> NodeCore<D, RRSTree<D>> for RRSTree<D> {
         todo!()
     }
 
-    fn parent(&self) -> Ref<Parent<D, RRSTree<D>>> {
+    fn parent(&self) -> &Parent<D, RRSTree<D>> {
         todo!()
     }
 
-    fn parent_mut(&self) -> RefMut<Parent<D, RRSTree<D>>> {
+    fn parent_mut(&self) -> &mut Parent<D, RRSTree<D>> {
         todo!()
     }
 
-    fn children(&self) -> Ref<Children<D, RRSTree<D>>> {
+    fn children(&self) -> &Children<D, RRSTree<D>> {
         self.root.children()
     }
 
-    fn children_mut(&self) -> RefMut<Children<D, RRSTree<D>>> {
+    fn children_mut(&self) -> &mut Children<D, RRSTree<D>> {
         self.root.children_mut()
     }
 
